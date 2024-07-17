@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Add Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form-based Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome for icons -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6; /* Light grey */
+            color: #333; /* Dark grey */
+        }
+
+        nav {
+            background-color: #111; /* Dark grey */
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav a {
+            color: #ffffff; /* White */
+            text-decoration: none;
+            margin-right: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333; /* Dark grey */
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 800px;
+            margin: 20px auto;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #fff; /* White */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+        }
+
+        .section {
+            width: 100%;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0; /* Light grey border */
+            transition: background-color 0.3s ease; /* Smooth transition */
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .section:hover {
+            background-color: #f5f5f5; /* Light grey on hover */
+        }
+
+        .section-heading {
+            font-size: 24px;
+            margin-left: 10px;
+            color: #333; /* Dark grey */
+        }
+
+        .section-icon {
+            font-size: 36px;
+            color: #45a049; /* Green */
+        }
+
+        form {
+            display: grid;
+            gap: 20px;
+            background-color: #fff; /* White */
+            padding: 20px;
+            border-radius: 8px;
+            display: none; /* Hide by default */
+            width: 100%;
+        }
+
+        label {
+            font-weight: bold;
+            color: #333; /* Dark grey */
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            transition: border-color 0.3s ease;
+            background-color: #f9f9f9; /* Light grey */
+            color: #333; /* Dark grey */
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 5px;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #45a049; /* Green */
+            color: #ffffff; /* White */
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #3e8e41; /* Darker green */
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #007bff; /* Blue */
+        }
+
+        .info-btn {
+            font-size: 20px;
+            color: #333; /* Dark grey */
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .info-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .info-content {
+            background-color: #fff; /* White */
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+        }
+
+        .close-btn {
+            font-size: 20px;
+            color: #333; /* Dark grey */
+            cursor: pointer;
+            align-self: flex-end;
+        }
+
+        .vehicle-type-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .vehicle-type-label {
+            margin-right: 20px;
+        }
+
+        /* Style checkboxes */
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        input[type="checkbox"] + label {
+            position: relative;
+            padding-left: 25px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="checkbox"] + label:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 18px;
+            height: 18px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        input[type="checkbox"]:checked + label:before {
+            content: '\2713';
+            font-size: 14px;
+            color: #45a049; /* Green */
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">Home</a> <!-- Add a link to go back to the home page -->
+    </nav>
+    <h1>Form-based Dashboard</h1>
+    <div class="container">
+        <div class="left-half">
+            <div id="road-details" class="section">
+                <h2 class="section-heading"><i class="fas fa-road section-icon"></i>Road Details</h2>
+                <span class="info-btn" onclick="showInfo('road-info')">ℹ️</span>
+                <form action="/run_simulation" method="post" data-section-name="road-details">
+                    <label for="road_length">Road Length:</label>
+                    <select id="road_length" name="road_length">
+                        <option value="1000">1000 meters </option>
+                        <option value="2000">2000 meters </option>
+                        <option value="3000">3000 meters </option>
+                        <option value="4000">4000 meters </option>
+                        <option value="5000">5000 meters </option>
+                        <option value="6000">6000 meters </option>
+                        <option value="7000">7000 meters </option>
+                        <option value="8000">8000 meters </option>
+                        <!-- Add more options as needed -->
+                    </select>
+                    
+                    <label for="road_width">Road Width:</label>
+                    <select id="road_width" name="road_width">
+                        <option value="3">3 meters (1 lane)</option>
+                        <option value="6">6 meters (2 lanes)</option>
+                        <option value="9">9 meters (3 lanes)</option>
+                        <option value="3">3 meters (4 lanes)</option>
+                        <option value="6">6 meters (5 lanes)</option>
+                        <option value="9">9 meters (6 lanes)</option>
+                        <option value="3">3 meters (7 lanes)</option>
+                        <option value="6">6 meters (8 lanes)</option>
+                        <option value="9">9 meters (9 lanes)</option>
+                        <!-- Add more options as needed -->
+                    </select>
+                    
+                    <label for="speed_limit">Speed Limit:</label>
+                    <input type="number" id="speed_limit" name="speed_limit" min="1" required>
+                </form>
+            </div>
+            
+            <div id="vehicle-details" class="section">
+                <h2 class="section-heading"><i class="fas fa-car section-icon"></i>Vehicle Details</h2>
+                <span class="info-btn" onclick="showInfo('vehicle-info')">ℹ️</span>
+                <form action="/run_simulation" method="post" data-section-name="vehicle-details">
+                    <label for="num_vehicles">Number of Vehicles:</label>
+                    <input type="number" id="num_vehicles" name="num_vehicles" min="1" required>
+                    
+                    <label>Vehicle Type:</label><br>
+                    <div class="vehicle-type-checkboxes">
+                        <input type="checkbox" id="car" name="vehicle_type[]" value="car">
+                        <label class="vehicle-type-label" for="car">Car</label>
+                        
+                        <input type="checkbox" id="bus" name="vehicle_type[]" value="bus">
+                        <label class="vehicle-type-label" for="bus">Bus</label>
+                        
+                        <input type="checkbox" id="truck" name="vehicle_type[]" value="truck">
+                        <label class="vehicle-type-label" for="truck">Truck</label>
+                        <!-- Add more checkboxes for additional vehicle types -->
+                    </div>
+                </form>
+            </div>
+            
+            
+            <div id="time-details" class="section">
+                <h2 class="section-heading"><i class="fas fa-clock section-icon"></i>Time Details</h2>
+                <span class="info-btn" onclick="showInfo('time-info')">ℹ️</span>
+                <form action="/run_simulation" method="post" data-section-name="time-details">
+                    <label for="departure_time">Departure Time:</label>
+                    <input type="datetime-local" id="departure_time" name="departure_time" required>
+                </form>
+            </div>
+            <div id="traffic-control" class="section">
+                <h2 class="section-heading"><i class="fas fa-traffic-light section-icon"></i>Traffic Control</h2>
+                <span class="info-btn" onclick="showInfo('traffic-info')">ℹ️</span>
+                <form action="/run_simulation" method="post" data-section-name="traffic-control">
+                    <label for="traffic_light_timing">Traffic Light Timing (seconds):</label>
+                    <input type="number" id="traffic_light_timing" name="traffic_light_timing" min="1" required>
+                    
+                    <input type="checkbox" id="stop_sign" name="stop_sign">
+                    <label for="stop_sign">Stop Sign</label>
+                </form>
+            </div>
+            <div id="simulation-settings" class="section">
+                <h2 class="section-heading"><i class="fas fa-cogs section-icon"></i>Simulation Settings</h2>
+                <span class="info-btn" onclick="showInfo('simulation-info')">ℹ️</span>
+                <form action="/run_simulation" method="post" data-section-name="simulation-settings">
+                    <label for="acceleration_rate">Acceleration Rate:</label>
+                    <input type="number" id="acceleration_rate" name="acceleration_rate" min="0" required>
+                    
+                    <label for="deceleration_rate">Deceleration Rate:</label>
+                    <input type="number" id="deceleration_rate" name="deceleration_rate" min="0" required>
+                    
+                    <input type="radio" id="lane_change_aggressive" name="lane_change" value="aggressive">
+                    <label for="lane_change_aggressive">Aggressive Lane Change</label>
+                    <input type="radio" id="lane_change_normal" name="lane_change" value="normal">
+                    <label for="lane_change_normal">Normal Lane Change</label>
+                    
+                    <label for="simulation_duration">Simulation Duration (minutes):</label>
+                    <input type="number" id="simulation_duration" name="simulation_duration" min="1" required>
+                    
+                    <label for="time_step_size">Time Step Size (seconds):</label>
+                    <input type="number" id="time_step_size" name="time_step_size" min="1" required>
+                </form>
+            </div>
+            <div id="intersection-type" class="section">
+                <h2 class="section-heading"><i class="fas fa-cross section-icon"></i>Intersection Type</h2>
+                <span class="info-btn" onclick="showInfo('intersection-info')">ℹ️</span>
+                <form action="/run_simulation" method="post" data-section-name="intersection-type">
+                    <select id="intersection_type" name="intersection_type">
+                        <option value="traffic_light">Traffic Light</option>
+                        <option value="priority">Priority</option>
+                        <option value="roundabout">Roundabout</option>
+                        <option value="uncontrolled">Uncontrolled</option>
+                        <option value="all-way_stop">All-Way Stop</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+        <div class="right-half">
+            <!-- Right half content will appear here -->
+        </div>
+    </div>
+
+    <!-- Info Modals -->
+    <div class="info-modal" id="road-info">
+        <div class="info-content">
+            <span class="close-btn" onclick="closeInfo('road-info')">✖️</span>
+            <p>Instructions for filling Road Details:</p>
+            <ul>
+                <li>Enter the length and width of the road in meters.</li>
+                <li>Provide the speed limit of the road in kilometers per hour (km/h).</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="info-modal" id="vehicle-info">
+        <div class="info-content">
+            <span class="close-btn" onclick="closeInfo('vehicle-info')">✖️</span>
+            <p>Instructions for filling Vehicle Details:</p>
+            <ul>
+                <li>Enter the number of vehicles expected on the road.</li>
+                <li>Select the type of vehicles (car, bus, truck).</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="info-modal" id="time-info">
+        <div class="info-content">
+            <span class="close-btn" onclick="closeInfo('time-info')">✖️</span>
+            <p>Instructions for filling Time Details:</p>
+            <ul>
+                <li>Provide the departure time for the simulation.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="info-modal" id="traffic-info">
+        <div class="info-content">
+            <span class="close-btn" onclick="closeInfo('traffic-info')">✖️</span>
+            <p>Instructions for filling Traffic Control:</p>
+            <ul>
+                <li>Enter the timing for traffic lights in seconds.</li>
+                <li>Check the box if there's a stop sign at the intersection.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="info-modal" id="simulation-info">
+        <div class="info-content">
+            <span class="close-btn" onclick="closeInfo('simulation-info')">✖️</span>
+            <p>Instructions for filling Simulation Settings:</p>
+            <ul>
+                <li>Enter the acceleration and deceleration rates.</li>
+                <li>Choose the lane change behavior (aggressive or normal).</li>
+                <li>Provide the simulation duration in minutes.</li>
+                <li>Set the time step size in seconds.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="info-modal" id="intersection-info">
+        <div class="info-content">
+            <span class="close-btn" onclick="closeInfo('intersection-info')">✖️</span>
+            <p>Instructions for filling Intersection Type:</p>
+            <ul>
+                <li>Select the type of intersection (traffic light, priority, roundabout, uncontrolled, all-way stop).</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Add info modals for other sections similarly -->
+
+    <button id="run-simulation-btn" style="margin: 20px auto; display: block; padding: 12px 24px; background-color: #45a049; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.3s ease;">Run Simulation</button>
+
+    <script>
+        let currentSection = ''; // Variable to store the current active section
+        let formData = {}; // Object to store form data
+
+        // Function to show the selected section's form and hide others
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                const form = section.querySelector('form');
+                if (section.id === sectionId) {
+                    form.style.display = 'grid';
+                } else {
+                    form.style.display = 'none';
+                }
+            });
+        }
+
+        // Function to show info modal
+        function showInfo(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'flex';
+        }
+
+        // Function to close info modal
+        function closeInfo(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+        }
+
+        document.querySelectorAll('.section').forEach(section => {
+            section.addEventListener('click', () => {
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                section.classList.add('active');
+                const sectionId = section.id;
+                showSection(sectionId);
+                currentSection = sectionId;
+                // Repopulate form fields with previous data
+                const sectionFormData = formData[currentSection] || {};
+                Object.keys(sectionFormData).forEach(key => {
+                    const input = document.querySelector(`[name="${key}"]`);
+                    if (input) {
+                        input.value = sectionFormData[key];
+                    }
+                });
+            });
+        });
+
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('input', () => {
+                // Store form data as it's being entered
+                const sectionName = form.getAttribute('data-section-name');
+                formData[sectionName] = {
+                    ...formData[sectionName],
+                    [form.name]: form.value
+                };
+            });
+        });
+
+        document.getElementById('run-simulation-btn').addEventListener('click', () => {
+            alert('Simulation is running...');
+            // Implement your simulation logic here
+        });
+    </script>
+    <!-- Leaflet Library -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([51.505, -0.09], 13);
+
+        // Add a tile layer (you can use different map providers)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Function to update the map based on form data
+        function updateMap() {
+            // Sample code to update map with form data
+            // Replace this with your actual logic
+            var roadLength = parseFloat(document.getElementById('road_length').value);
+            var roadWidth = parseFloat(document.getElementById('road_width').value);
+            var speedLimit = parseFloat(document.getElementById('speed_limit').value);
+
+            // Add a marker at the center of the map
+            var marker = L.marker([51.5, -0.09]).addTo(map);
+            marker.bindPopup(`<b>Road Details:</b><br>Length: ${roadLength}m<br>Width: ${roadWidth}m<br>Speed Limit: ${speedLimit}km/h`).openPopup();
+        }
+
+        // Event listener for the "Run Simulation" button
+        document.getElementById('run-simulation-btn').addEventListener('click', () => {
+            updateMap();
+        });
+    </script>
+</body>
+</html>

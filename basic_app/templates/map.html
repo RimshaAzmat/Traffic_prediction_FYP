@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map-based Simulation Tool</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1f2833; /* Blackish-blue */
+            color: #ffffff; /* White */
+        }
+
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+
+        .controls-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls-container button {
+            display: block;
+            margin-bottom: 10px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff; /* Blue */
+            color: #fff; /* White */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .controls-container button:hover {
+            background-color: #0056b3; /* Darker blue */
+        }
+
+        .controls-container input[type="range"] {
+            width: 100%;
+        }
+
+        .marker-icon {
+            background-color: #ff0000; /* Red */
+            border: 2px solid #ffffff; /* White */
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+        }
+
+        .traffic-signal-icon {
+            background-color: #00ff00; /* Green */
+            border: 2px solid #000000; /* Black */
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <!-- Simulation controls -->
+    <div class="controls-container">
+        <button id="startSimulationButton">Start Simulation</button>
+        <button id="stopSimulationButton">Stop Simulation</button>
+        <input type="range" id="vehicleDensitySlider" min="0" max="100" value="50">
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        var drawnItems = new L.FeatureGroup().addTo(map);
+        var drawControl = new L.Control.Draw({
+            draw: {
+                polyline: false,
+                polygon: false,
+                circle: false,
+                rectangle: false,
+                marker: {
+                    icon: L.divIcon({ className: 'marker-icon' }),
+                    repeatMode: true
+                },
+            },
+            edit: {
+                featureGroup: drawnItems
+            }
+        });
+        map.addControl(drawControl);
+        map.on('draw:created', function (event) {
+            var layer = event.layer;
+            if (layer instanceof L.Marker) {
+                layer.setIcon(L.divIcon({ className: 'marker-icon' }));
+            }
+            drawnItems.addLayer(layer);
+        });
+        var trafficSignals = [];
+        var trafficSignalLayer = L.layerGroup().addTo(map);
+        map.on('click', function (event) {
+            var trafficSignalMarker = L.marker(event.latlng, { icon: L.divIcon({ className: 'traffic-signal-icon' }) });
+            trafficSignals.push(trafficSignalMarker);
+            trafficSignalLayer.addLayer(trafficSignalMarker);
+        });
+
+        document.getElementById('startSimulationButton').addEventListener('click', function () {
+            console.log('Simulation started');
+        });
+
+        document.getElementById('stopSimulationButton').addEventListener('click', function () {
+            console.log('Simulation stopped');
+        });
+
+        document.getElementById('vehicleDensitySlider').addEventListener('input', function () {
+            console.log('Vehicle Density:', this.value);
+        });
+    </script>
+</body>
+</html>

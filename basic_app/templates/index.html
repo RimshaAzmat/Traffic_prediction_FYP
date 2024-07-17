@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Traffic Congestion Simulation App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6; /* Light grey */
+            color: #333; /* Dark grey */
+        }
+        h1 {
+            color: #45a049; /* Green */
+            margin-top: 50px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 18px;
+            color: #333; /* Dark grey */
+            margin-bottom: 30px;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .button {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #ffffff; /* White */
+            background-color: #45a049; /* Green */
+            border: 2px solid #45a049; /* Green border */
+            border-radius: 25px; /* Rounded corners */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s, border-color 0.3s; /* Smooth transitions */
+        }
+        .button:hover {
+            background-color: #3e8e41; /* Darker green */
+            transform: translateY(-2px); /* Move up slightly on hover */
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* Slight increase in shadow on hover */
+            border-color: #3e8e41; /* Darker green border */
+        }
+        .button:active {
+            background-color: #398d3f; /* Slightly darker green on click */
+            transform: translateY(1px); /* Move down slightly on click */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Slight decrease in shadow on click */
+            border-color: #398d3f; /* Slightly darker green border on click */
+        }
+    </style>
+</head>
+<body>
+
+<h1>Welcome to Traffic Congestion Simulation App</h1>
+<p>Select one feature from the options below to create your scenario:</p>
+
+<div class="button-container">
+    <a href="/map" class="button button-map">Map-based Scenario</a>
+    <a href="/form" class="button button-form">Form-based Scenario</a>
+    <button onclick="openOSMWizard()" class="button button-osm">Open OSM Web Wizard</button>
+    <a href="/show_data" class="button button-data">Show Simulation Data</a> <!-- New button -->
+</div>
+
+<script>
+    function openOSMWizard() {
+        window.location.href = "/open_osm_wizard";
+    }
+</script>
+
+</body>
+</html>
